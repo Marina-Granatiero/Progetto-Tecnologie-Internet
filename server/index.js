@@ -3,20 +3,24 @@ const cors = require('cors');
 require('dotenv').config();
 
 const db = require('./config/db');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware per richieste cross-origin e parsing JSON
+// Middleware globali
 app.use(cors());
 app.use(express.json());
 
-// Endpoint di test per verificare lo stato del server
+// Registrazione router di autenticazione
+app.use('/api/auth', authRoutes);
+
+// Endpoint di test stato server
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server attivo e funzionante' });
 });
 
-// Endpoint REST: Elenco dei settori con il numero di biglietti disponibili
+// Endpoint REST: Elenco settori con conteggio biglietti liberi
 app.get('/api/settori', async (req, res) => {
   try {
     const query = `
@@ -38,7 +42,7 @@ app.get('/api/settori', async (req, res) => {
   }
 });
 
-// Avvio del server HTTP e verifica connessione al database
+// Avvio server e controllo connessione MySQL
 app.listen(PORT, async () => {
   console.log(`Server HTTP in ascolto sulla porta ${PORT}`);
   try {
