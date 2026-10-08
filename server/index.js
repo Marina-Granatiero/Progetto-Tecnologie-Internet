@@ -2,25 +2,19 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const db = require('./config/db');
-const authRoutes = require('./routes/auth');
+const db = require('./db');
+const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Middleware globali
 app.use(cors());
 app.use(express.json());
 
-// Registrazione router di autenticazione
+// Rotte API
 app.use('/api/auth', authRoutes);
+app.use('/api/ordini', orderRoutes);
 
-// Endpoint di test stato server
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server attivo e funzionante' });
-});
-
-// Endpoint REST: Elenco settori con conteggio biglietti liberi
+// Endpoint disponibilità settori
 app.get('/api/settori', async (req, res) => {
   try {
     const query = `
@@ -33,22 +27,17 @@ app.get('/api/settori', async (req, res) => {
       FROM settori s
       LEFT JOIN biglietti b ON s.id_settore = b.fk_settore
       GROUP BY s.id_settore, s.nome_settore, s.prezzo, s.capacita_max
+      ORDER BY s.id_settore ASC
     `;
     const [rows] = await db.query(query);
     res.json(rows);
-  } catch (error) {
-    console.error('Errore durante il recupero dei settori:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+  } catch (err) {
+    console.error('Errore query settori:', err);
+    res.status(500).json({ error: 'Errore nel recupero dei settori' });
   }
 });
 
-// Avvio server e controllo connessione MySQL
-app.listen(PORT, async () => {
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
   console.log(`Server HTTP in ascolto sulla porta ${PORT}`);
-  try {
-    await db.query('SELECT 1');
-    console.log('Connessione al database MySQL stabilita con successo.');
-  } catch (err) {
-    console.error('Impossibile connettersi al database MySQL:', err.message);
-  }
 });
