@@ -1,18 +1,21 @@
-﻿const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 
+// Verifica il token JWT inviato come "Authorization: Bearer <token>".
+// 401 = non autenticato (token assente, scaduto o manomesso).
 module.exports = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const intestazione = req.headers['authorization'] || '';
+  const [schema, token] = intestazione.split(' ');
 
-  if (!token) {
+  if (!token || !/^Bearer$/i.test(schema)) {
     return res.status(401).json({ error: 'Accesso negato: token mancante.' });
   }
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET || 'CHIAVE_SEGRETA_PROGETTO_2026');
-    req.user = verified;
+    const { id_utente, email, ruolo } = jwt.verify(token, config.jwt.secret);
+    req.user = { id_utente, email, ruolo };
     next();
-  } catch (err) {
-    return res.status(403).json({ error: 'Token non valido o scaduto.' });
+  } catch {
+    return res.status(401).json({ error: 'Token non valido o scaduto.' });
   }
 };

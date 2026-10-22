@@ -1,15 +1,17 @@
-﻿const mysql = require('mysql2/promise');
-require('dotenv').config();
+// Pool di connessioni MySQL/MariaDB condiviso da tutta l'applicazione.
+const mysql = require('mysql2/promise');
+const config = require('./config');
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'concerto_db',
-  port: process.env.DB_PORT || 3306,
+  host: config.db.host,
+  port: config.db.port,
+  user: config.db.user,
+  password: config.db.password,
+  database: config.db.database,
+  charset: 'utf8mb4',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
 });
 
 module.exports = db;

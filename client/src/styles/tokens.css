@@ -1,0 +1,142 @@
+/* ==========================================================================
+   Token del design system "Concerto"
+   Carta lilla-bianca + inchiostro indaco + pastelli piatti (stile carta ritagliata).
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-var.woff2') format('woff2');
+  font-weight: 500 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Figtree';
+  src: url('/fonts/figtree-var.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Mono';
+  src: url('/fonts/dmmono-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+/* Registrate per poter animare il passaggio di colore dello sfondo fra le pagine */
+@property --tono-a {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #d9d0ff;
+}
+@property --tono-b {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffd9c5;
+}
+
+:root {
+  /* carta e inchiostro */
+  --carta: #f8f7fc;
+  --carta-2: #ffffff;
+  --inchiostro: #26244a;
+  --inchiostro-2: #4a4875;
+  --inchiostro-3: #64628f;
+  --linea: rgba(38, 36, 74, 0.13);
+  --linea-forte: rgba(38, 36, 74, 0.3);
+
+  /* pastelli */
+  --lilla: #d9d0ff;
+  --pesca: #ffd9c5;
+  --menta: #c4f0dc;
+  --cielo: #c9e3ff;
+  --burro: #ffefa8;
+  --rosa: #ffd0e2;
+
+  /* varianti più cariche: puntini, grafici, stati */
+  --lilla-vivo: #8b78ff;
+  --pesca-vivo: #ff9a6b;
+  --menta-vivo: #2fb083;
+  --cielo-vivo: #4e9bec;
+  --burro-vivo: #e2b100;
+  --rosa-vivo: #ee6a9f;
+
+  --accento: #5b45e8;
+  --errore: #a71f58;
+  --ok: #126a4d;
+
+  /* tipografia */
+  --f-display: 'Bricolage Grotesque', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --f-testo: 'Figtree', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --f-codice: 'DM Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  /* forme */
+  --r-s: 10px;
+  --r-m: 16px;
+  --r-l: 24px;
+  --r-xl: 34px;
+  --r-pill: 999px;
+
+  /* ombre tinte di viola (mai grigio neutro) */
+  --ombra-1: 0 1px 2px rgba(38, 36, 74, 0.06), 0 10px 26px -12px rgba(91, 69, 232, 0.28);
+  --ombra-2: 0 2px 4px rgba(38, 36, 74, 0.05), 0 28px 60px -24px rgba(91, 69, 232, 0.38);
+
+  /* movimento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-molla: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --larghezza: 1160px;
+}
+
+/* Tono dello sfondo per pagina (animato) */
+body {
+  transition:
+    --tono-a 0.9s ease,
+    --tono-b 0.9s ease;
+}
+body[data-tono='lilac'] {
+  --tono-a: var(--lilla);
+  --tono-b: var(--pesca);
+}
+body[data-tono='peach'] {
+  --tono-a: var(--pesca);
+  --tono-b: var(--rosa);
+}
+body[data-tono='mint'] {
+  --tono-a: var(--menta);
+  --tono-b: var(--cielo);
+}
+body[data-tono='sky'] {
+  --tono-a: var(--cielo);
+  --tono-b: var(--lilla);
+}
+body[data-tono='butter'] {
+  --tono-a: var(--burro);
+  --tono-b: var(--menta);
+}
+
+/* Colori dei settori / dei pannelli: --sec = colore pieno, --sec-vivo = versione carica */
+.tema-lilac {
+  --sec: var(--lilla);
+  --sec-vivo: var(--lilla-vivo);
+}
+.tema-peach {
+  --sec: var(--pesca);
+  --sec-vivo: var(--pesca-vivo);
+}
+.tema-mint {
+  --sec: var(--menta);
+  --sec-vivo: var(--menta-vivo);
+}
+.tema-sky {
+  --sec: var(--cielo);
+  --sec-vivo: var(--cielo-vivo);
+}
+.tema-butter {
+  --sec: var(--burro);
+  --sec-vivo: var(--burro-vivo);
+}
+.tema-rose {
+  --sec: var(--rosa);
+  --sec-vivo: var(--rosa-vivo);
+}

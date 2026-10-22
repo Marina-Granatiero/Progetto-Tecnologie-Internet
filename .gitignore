@@ -3,3 +3,5 @@ node_modules/
 dist/
 build/
 .DS_Store
+# Collaudo: screenshot generati localmente
+client/e2e/screenshots/

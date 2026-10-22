@@ -1,43 +1,57 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+// Punto di ingresso: avvia il server HTTP sulla porta configurata.
+let app;
+let config;
+let db;
+let verificaSchema;
+try {
+  config = require('./config');
+  db = require('./db');
+  app = require('./app');
+  verificaSchema = require('./utils/verificaSchema').verificaSchema;
+} catch (err) {
+  console.error(`\n✖ Avvio non riuscito: ${err.message}\n`);
+  process.exit(1);
+}
 
-const db = require('./db');
-const authRoutes = require('./routes/authRoutes');
-const orderRoutes = require('./routes/orderRoutes');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Rotte API
-app.use('/api/auth', authRoutes);
-app.use('/api/ordini', orderRoutes);
-
-// Endpoint disponibilità settori
-app.get('/api/settori', async (req, res) => {
+const server = app.listen(config.port, async () => {
+  console.log(`✔ Server HTTP in ascolto sulla porta ${config.port}`);
   try {
-    const query = `
-      SELECT 
-        s.id_settore,
-        s.nome_settore,
-        s.prezzo,
-        s.capacita_max,
-        COUNT(CASE WHEN b.venduto = 0 THEN 1 END) AS biglietti_disponibili
-      FROM settori s
-      LEFT JOIN biglietti b ON s.id_settore = b.fk_settore
-      GROUP BY s.id_settore, s.nome_settore, s.prezzo, s.capacita_max
-      ORDER BY s.id_settore ASC
-    `;
-    const [rows] = await db.query(query);
-    res.json(rows);
+    await db.query('SELECT 1');
+    console.log(`✔ Database "${config.db.database}" raggiungibile su ${config.db.host}:${config.db.port}`);
+    const problemi = await verificaSchema(db);
+    if (problemi.length === 0) {
+      console.log('✔ Struttura del database corretta');
+    } else {
+      console.error(
+        `✖ Il database "${config.db.database}" è raggiungibile ma la struttura non è quella prevista:\n` +
+          problemi.map((p) => `   - ${p}`).join('\n') +
+          '\n  Finché non lo sistemi il sito mostra "Errore interno del server".' +
+          '\n  Rimedio: ferma il server (Ctrl+C), esegui "npm run db:reset" (ricrea il database da zero) e riavvia con "npm start".'
+      );
+    }
   } catch (err) {
-    console.error('Errore query settori:', err);
-    res.status(500).json({ error: 'Errore nel recupero dei settori' });
+    console.error(
+      `✖ Database non raggiungibile (${err.code || err.message}). ` +
+        'Controlla che MySQL/MariaDB (XAMPP) sia avviato e che i dati in server/.env siano corretti.'
+    );
   }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server HTTP in ascolto sulla porta ${PORT}`);
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(
+      `\n✖ La porta ${config.port} è già occupata (un altro "node index.js" è ancora in esecuzione?).` +
+        '\n  Chiudi il processo precedente oppure cambia PORT in server/.env.\n'
+    );
+  } else {
+    console.error('Errore del server:', err);
+  }
+  process.exit(1);
 });
+
+// Chiusura ordinata (Ctrl+C)
+for (const segnale of ['SIGINT', 'SIGTERM']) {
+  process.on(segnale, () => {
+    server.close(() => db.end().finally(() => process.exit(0)));
+  });
+}

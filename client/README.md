@@ -1,16 +1,16 @@
-# React + Vite
+# Client – React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaccia della piattaforma di vendita biglietti. La documentazione generale è nel [README della repository](../README.md).
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev        # sviluppo su http://localhost:5173 (il server API deve girare su :5000)
+npm run build      # build di produzione in dist/
+npm run lint       # ESLint (react-hooks v7): deve restare a 0 problemi
+npm run test:e2e   # collaudo nel browser (richiede Playwright, vedi README principale)
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- L'indirizzo dell'API è `http://<host>:5000/api`; si cambia con la variabile `VITE_API_URL` (file `.env` in questa cartella).
+- Gli stili sono in `src/styles/`: `tokens.css` (palette, font, forme), `base.css`, `layout.css` (sfondo, barra, sipario di transizione), `components.css` (bottoni, form, biglietti con strappo, puntini dei posti), `pages.css` (pagine e responsive). `src/index.css` li importa nell'ordine corretto.
+- I font (Bricolage Grotesque, Figtree, DM Mono – licenza OFL, testi in `public/fonts/`) sono serviti dal progetto stesso.
+- Tutte le animazioni rispettano `prefers-reduced-motion`.
